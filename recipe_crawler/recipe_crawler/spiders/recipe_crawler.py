@@ -2,18 +2,21 @@ import scrapy
 
 class RecipeSpider(scrapy.Spider):
 	name = 'recipes'
-
-	def start_requests(self):
-	    urls = [
-	        'https://www.geniuskitchen.com/recipe/',
-	    ]
-	    for url in urls:
-	        yield scrapy.Request(url=url, callback=self.parse)
+	start_urls = [
+        'https://www.geniuskitchen.com/recipe/',
+    ]
 
 	def parse(self, response):
-	    page = response.url.split("/")[-2]
-	    filename = 'out_recipe-%s.html' % page
-	    with open(filename, 'wb') as f:
-	        f.write(response.body)
-	    self.log('Saved file %s' % filename)
+		for recipe in response.css('div.fd-recipe'):
+			next_page= recipe.css('div.fd-inner-tile div.fd-img-wrap div.inner-wrapper a::attr(href)').extract_first()
+			print("--------------------------------URL: "+next_page)
+			if next_page is not None:
+				print("---------------------------here")
+				next_page = response.urljoin(str(next_page))
+	        	yield scrapy.Request(str(next_page), callback=self.parse)
+	        	#response.url.split("/")[-2]
+		    	filename = 'outputrecipe-%s.html' % page
+		    	with open(filename, 'a') as f:
+		    		f.write(response.body)
+
 

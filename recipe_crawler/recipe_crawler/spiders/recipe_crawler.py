@@ -1,35 +1,30 @@
-import scrapy
+from bs4 import BeautifulSoup
+import urllib2
+import re
+ 
+def getLinks(url):
+    html_page = urllib2.urlopen(url)
+    soup = BeautifulSoup(html_page)
+    links = []
+ 
+    for link in soup.findAll('a', attrs={'href': re.compile("^http://")}):
+    	#if 'geniuskitchen' in link.get('href'):
+        links.append(link.get('href'))
 
-class RecipeSpider(scrapy.Spider):
-	name = 'recipes'
-	start_urls = [
-        'https://www.geniuskitchen.com/recipe/',
-    ]
+    recipe_facts=[]
+    ingredients=[]
+    directions=[]
+ 
+    for link in links:
+    	html_page = urllib2.urlopen(link)
+    	soup = BeautifulSoup(html_page)
+    	for rf in soup.findAll("div", {"class": "recipe-facts"}).getText():
+    		recipe_facts.append(rf)
+    	for i in soup.findAll("div", {"class": "ingredient-list"}).getText():
+    		ingredients.append(i)
+    	for d in soup.findAll("div", {"class": "directions-inner"}).getText():
+    		directions.append(d)
 
-	def parse(self, response):
-		body_tag=response.css("body div.fd-site-wrapper div.gk-tile-content")
-		i=1
-		for tc in body_tag:
-			if i==2:
-				print('-----------------------------body_tag '+str(body_tag))
-				recipe=tc.css("div.tile-stream div.fd-recipe")
-				print('-------------------recipe: '+str(recipe))
-				it= recipe.css('div.fd-inner-tile')
-				print("------------------it: "+str(it))
-				iw=it.css('div.fd-img-wrap')
-				print("------------------iw: "+str(iw))
-				next_page=iw.css('div.inner-wrapper a::attr(href)')
-
-				print("--------------------------------URL: ")
-				print(next_page)
-				if next_page is not None:
-					print("---------------------------here")
-					next_page = response.urljoin(str(next_page))
-		        	yield scrapy.Request(str(next_page), callback=self.parse)
-		        	#response.url.split("/")[-2]
-			    	filename = 'outputrecipe-%s.html'
-			    	with open(filename, 'a') as f:
-			    		f.write(response.body)
-			i+=1
-
-
+    	print("Recipe Facts:" +recipe_facts)
+    	print("Ingredients: "+ingredients)
+    	print("Directions: "+directions)

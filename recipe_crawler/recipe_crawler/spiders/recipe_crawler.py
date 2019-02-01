@@ -1,39 +1,56 @@
-from bs4 import BeautifulSoup
-import urllib2
-import re
 import requests
-import cookielib
+import re
+import os
+from bs4 import BeautifulSoup, SoupStrainer
 
-headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12;rv:50.0) Gecko/20100101 Firefox/50.0'}
-cookie = cookielib.CookieJar()
-handler = urllib2.HTTPCookieProcessor(cookie)
-opener = urllib2.build_opener(handler)
-url="http://www.geniuskitchen.com/recipe"
+baseSearchURL = "https://www.geniuskitchen.com/recipe/?pn="
+baseSiteURL = "https://www.geniuskitchen.com"
+#append number from 1-1989 to searchURL to get all search pages
+for pageNum in range(100):
+	searchPage = requests.get(baseSearchURL + str(pageNum))
+	print(searchPage.content)
+	bigSoup = BeautifulSoup(searchPage.content, 'html.parser')
 
-request = urllib2.Request(url = url, headers=headers)
-html_page = opener.open(request).read()
-soup = BeautifulSoup(html_page)
-links = []
+	#use soupstrainer to basically create a filter to only look at a tags with link containing /recipes/food/views/  <--all recipe have that path
+	pageLinks = SoupStrainer('a', href=re.compile('www.geniuskitchen.com'))
+	#make list using above filter
+	allLinks = [tag for tag in BeautifulSoup(searchPage.content, 'html.parser', parse_only=pageLinks)]
 
-for link in soup.findAll('a', attrs={'href': re.compile("^http://")}):
-	#if "geniuskitchen" in link.get('href'):
-    links.append(link.get('href'))
+	file = open("geniuskitchen.txt","w")
 
-recipe_facts=[]
-ingredients=[]
-directions=[]
+	#for every link we just scraped
+	for i in allLinks:	#every 5th because each link on search page has 5 duplicates
+		#add extension to end of base site URL to get full page URL
+		pageName = i
+		
+		#grab ingredients and recipe and nutrition stuff from each page and write it to file
+		page = requests.get(pageName)
+	
+		#make the soup for each page
+		soup = BeautifulSoup(page.content, 'html.parser')
+		print(page.content)
+		
+		#this grabs all li tags with class=ingredient, stores them in list and writes them to file with header
+		ingredients = soup.findAll("li", "data-ingredient")
+		if ingredients:
+			file.write("---------------INGREDIENTS----------------\n")
+			for ingred in ingredients:
+				file.write(ingred.get_text(strip=True) + "\n")
 
-for link in links:
-	response = requests.get(link, headers=headers)
-	soup = BeautifulSoup(response.text,"html.parser")
-	recipe_facts=soup.findAll("div", attrs={"class": "recipe-facts"})
-	ingredients=soup.findAll("div", attrs={"class": "ingredient-list"})
-	directions= soup.findAll("div", attrs={"class": "directions-inner container-xs"})
+		
+		recipe = soup.findAll("div", "directions-inner container-xs ol li")
+		if recipe:
+			file.write("\n--------------PREPARATION----------------\n")
+			for step in recipe:
+				file.write(step.get_text(strip=True) + "\n")
 
-	if recipe_facts:
-		print("Recipe Facts:" +str(recipe_facts))
-	if ingredients:
-		print("Ingredients: "+str(ingredients))
-	if directions:
-		print("Directions: "+str(directions))
+		#parallel lists containing corresponding nutrition labels and data
+
+		nutrition_facts=soup.findAll("div", "recipe-facts")
+		if nutrition_facts:
+			file.write("\n-------------NUTRITIONAL INFO--------------\n")
+			for i in range(len(nutrition_facts)):
+				file.write(i.get_text(strip=True) + "\n")
+
+
 

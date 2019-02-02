@@ -13,6 +13,8 @@ cookie = cookielib.CookieJar()
 handler = urllib2.HTTPCookieProcessor(cookie)
 opener = urllib2.build_opener(handler)
 
+f = open("foodie_crush_output.txt", "w")
+
 def getLinks(url):
 	links=[]
 	if 'www.foodiecrush' in url:
@@ -26,7 +28,7 @@ def getLinks(url):
 
 links = getLinks("https://www.foodiecrush.com/recipes")
 for link in links:
-	#print(link['href'])
+	#f.write(link['href'])
 	if 'www.' in link['href']:
 		request = urllib2.Request(url = link['href'], headers=headers)
 		r=requests.get(link['href'])
@@ -42,31 +44,31 @@ for link in links:
 			instructions= soup.findAll("div",attrs={"class": "wprm-recipe-instruction-text"})
 
 			if recipe_name:
-				print("Recipe Content: \n")
-				for p in recipe_content:
-					print(p.get_text())
+				f.write("Recipe Content: \n")
+				for i in recipe_content:
+					f.write(i.get_text().encode('utf-8'))
 
-				print("Recipe Tags: \n")
+				f.write("Recipe Tags: \n")
 				for i in recipe_tags:
-					print(i.get_text())
+					f.write(i.get_text().encode('utf-8'))
 
-				print("Recipe Name: \n")
+				f.write("Recipe Name: \n")
 				for i in recipe_name:
-					print(i.get_text())
+					f.write(i.get_text().encode('utf-8'))
 
-				print("Recipe Summary: \n")
+				f.write("Recipe Summary: \n")
 				for i in recipe_summary:
-					print(i.get_text())
+					f.write(i.get_text().encode('utf-8'))
 
-				print("Recipe Ingredients: \n")
+				f.write("Recipe Ingredients: \n")
 				for i in ingredients:
-					print(i.get_text())
+					f.write(i.get_text().encode('utf-8'))
 
-				print("Recipe instructions: \n")
+				f.write("Recipe instructions: \n")
 				for i in instructions:
-					print(i.get_text())
+					f.write(i.get_text().encode('utf-8'))
 
-				print("*********************************************************")
+				f.write("*********************************************************")
 
 	#links2= getLinks(link['href'])
 	#links=links+links2

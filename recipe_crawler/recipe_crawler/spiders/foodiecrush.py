@@ -65,7 +65,8 @@ for link in links:
 				print("Recipe instructions: \n")
 				for i in instructions:
 					print(i.get_text())
-			print("*********************************************************")
+
+				print("*********************************************************")
 
 	#links2= getLinks(link['href'])
 	#links=links+links2

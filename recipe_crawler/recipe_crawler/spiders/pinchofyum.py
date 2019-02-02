@@ -26,9 +26,10 @@ def getLinks(url):
 	        	links.append(link)
 	return links
 
-for j in range(31):
-	print("page "+str(j)+" of 31")
-	links = getLinks("https://www.foodiecrush.com/category/recipes/page/"+str(j)+"/")
+for j in range(32):
+	k=(j+1)
+	print("page "+str(k)+" of 31")
+	links = getLinks("https://www.pinchofyum.com/category/recipes?fwp_paged="+str(k)+"/")
 
 	for link in links:
 		#f.write(link['href'])

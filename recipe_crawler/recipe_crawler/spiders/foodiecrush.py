@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from HTMLParser import HTMLParser
 import urlparse
 import urllib2
 import re
@@ -36,7 +37,8 @@ for link in links:
 			recipe_facts=soup.findAll("article", attrs={"class": "post"})
 
 			if recipe_facts:
-				print("Recipe Facts:" +str(recipe_facts))
+				for fact in recipe_facts:
+					print(fact.get_text())
 				print("*********************************************************")
 
 	#links2= getLinks(link['href'])

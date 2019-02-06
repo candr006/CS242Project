@@ -49,9 +49,9 @@ def getLinks(url):
 	    	if link not in links:
 	        	links.append(link)
 	return links
-
+pg_count=1
 for j in range(1,31):
-	print("page "+str(j)+" of 31")
+	print("-------------Menu page "+str(j)+" of 31-----------------")
 	links = getLinks("https://www.foodiecrush.com/category/recipes/page/"+str(j)+"/")
 
 	for link in links:
@@ -62,7 +62,7 @@ for j in range(1,31):
 			try:
 				for k in range(1,11):
 					proxy = next(proxy_pool)
-					r=requests.get(link['href'],proxies={"http": proxy, "https": proxy})
+					r=requests.get(link['href'])
 					r.raise_for_status()
 			except requests.exceptions.HTTPError as errh:
 				print ("Http Error:",errh)
@@ -75,40 +75,13 @@ for j in range(1,31):
 
 			if(r.status_code==200):
 				html_page = requests.get(link['href'])
-				soup = BeautifulSoup(html_page.text, 'html.parser')
-				recipe_content=soup.findAll("p")
-				recipe_tags=soup.findAll("a", attrs={"class": "entry-tags"})
-				recipe_name=soup.findAll("h2",attrs={"class": "wprm-recipe-name"})
-				recipe_summary= soup.findAll("div",attrs={"class": "wprm-recipe-summary"})
-				ingredients= soup.findAll("li",attrs={"class": "wprm-recipe-ingredient"})
-				instructions= soup.findAll("div",attrs={"class": "wprm-recipe-instruction-text"})
+				f.write(html_page.text.encode('utf-8'))
+				print("Recipe page count: "+str(pg_count))
+				pg_count+=1
+				#soup = BeautifulSoup(html_page.text, 'html.parser')
+				
 
-				if recipe_name:
-					f.write("Recipe Content: \n")
-					for i in recipe_content:
-						f.write(i.get_text().encode('utf-8'))
-
-					f.write("Recipe Tags: \n")
-					for i in recipe_tags:
-						f.write(i.get_text().encode('utf-8'))
-
-					f.write("Recipe Name: \n")
-					for i in recipe_name:
-						f.write(i.get_text().encode('utf-8'))
-
-					f.write("Recipe Summary: \n")
-					for i in recipe_summary:
-						f.write(i.get_text().encode('utf-8'))
-
-					f.write("Recipe Ingredients: \n")
-					for i in ingredients:
-						f.write(i.get_text().encode('utf-8'))
-
-					f.write("Recipe instructions: \n")
-					for i in instructions:
-						f.write(i.get_text().encode('utf-8'))
-
-					f.write("*********************************************************")
+				f.write("*********************************************************")
 
 		#links2= getLinks(link['href'])
 		#links=links+links2

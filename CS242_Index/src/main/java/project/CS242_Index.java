@@ -1,17 +1,10 @@
 package project;
 
-import java.io.*;
-import java.nio.charset.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -21,18 +14,26 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.Version;
+import org.jsoup.Jsoup;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.Files.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+
 import static java.nio.file.Files.newBufferedReader;
-import static java.nio.file.Paths.get;
+
+
+
 
 
 public class CS242_Index 
 {
+    public static String remove_html(String html) {
+        return Jsoup.parse(html).text();
+    }
+
     public static void main( String[] args ) throws IOException, ParseException {
         Analyzer analyzer = new StandardAnalyzer();
 
@@ -52,15 +53,27 @@ public class CS242_Index
             Document doc = new Document();
             try (BufferedReader r = newBufferedReader(Paths.get(file_path.concat(i.toString()).concat(".txt")),StandardCharsets.UTF_8)) {
                 String line;
+                String cleanLine;
                 while((line = r.readLine()) != null){
-                        doc.add(new TextField("content", line, Field.Store.YES) );
-                        //print out what is being added to the document for testing purposes
-                        System.out.println("Reading Line: "+line);
+                        cleanLine=remove_html(line);
+                        if(!cleanLine.isEmpty()) {
+                            //I put stars in the output to separate the recipes
+                            if(cleanLine.equals("*********************************************************")) {
+                                //when the line being read is stars (recipe separator), add the doc to the index and create a new doc
+                                indexWriter.addDocument(doc);
+                                doc = new Document();
+
+                            }else{
+                                doc.add(new TextField("content", cleanLine, Field.Store.YES));
+                                //print out what is being added to the document for testing purposes
+                                System.out.println("Reading Line: " + cleanLine);
+                            }
+                        }
                 }
                 i++;
 
             }
-            indexWriter.addDocument(doc);
+
         }
 
         indexWriter.close();
@@ -69,9 +82,9 @@ public class CS242_Index
         DirectoryReader indexReader = DirectoryReader.open(directory);
         IndexSearcher indexSearcher = new IndexSearcher(indexReader);
         QueryParser parser = new QueryParser("content", analyzer);
-        
+
         //This is the query that you'll be indexing the documents by
-        Query query = parser.parse("ingredients");
+        Query query = parser.parse("chicken");
 
         System.out.println("");
         System.out.println("------------------------ RESULTS --------------------------");

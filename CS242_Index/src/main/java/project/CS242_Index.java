@@ -44,6 +44,8 @@ public class CS242_Index
         IndexWriter indexWriter = new IndexWriter(directory, config);
 
 
+        //this is where the outputs of the crawler are stored
+        //iterate through all the crawled files
         String file_path="outputs/foodie_crush_output";
         Integer i=1;
         while(i<2) {
@@ -52,6 +54,7 @@ public class CS242_Index
                 String line;
                 while((line = r.readLine()) != null){
                         doc.add(new TextField("content", line, Field.Store.YES) );
+                        //print out what is being added to the document for testing purposes
                         System.out.println("Reading Line: "+line);
                 }
                 i++;
@@ -66,6 +69,8 @@ public class CS242_Index
         DirectoryReader indexReader = DirectoryReader.open(directory);
         IndexSearcher indexSearcher = new IndexSearcher(indexReader);
         QueryParser parser = new QueryParser("content", analyzer);
+        
+        //This is the query that you'll be indexing the documents by
         Query query = parser.parse("ingredients");
 
         System.out.println("");

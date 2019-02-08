@@ -1,9 +1,10 @@
 package project;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -24,6 +25,11 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.*;
+import static java.nio.file.Files.newBufferedReader;
+import static java.nio.file.Paths.get;
+
 
 public class CS242_Index 
 {
@@ -37,23 +43,29 @@ public class CS242_Index
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
         IndexWriter indexWriter = new IndexWriter(directory, config);
 
-        String[] pages = {
-                "Search engine is considered the most successful application of IR.",
-                "Collect your data and index with Lucene",
-                "index your data using Hadoop and build Web Interface",
-        };
-        for (String page: pages) {
+
+        String file_path="/outputs/foodie_crush_output";
+        Integer i=1;
+        while(i<130) {
             Document doc = new Document();
-            doc.add(new TextField("content", page, Field.Store.YES));
+           // Files.newBufferedReader(file_path.concat(i.toString()).concat(".txt"),StandardCharsets.UTF_8)
+            try (BufferedReader r = newBufferedReader(Paths.get(file_path.concat(i.toString()).concat(".txt")),StandardCharsets.UTF_8)) {
+                String line;
+                while((line = r.readLine()) != null){
+                        doc.add(new TextField("content", line, Field.Store.YES) );
+                }
+
+            }
             indexWriter.addDocument(doc);
         }
+
         indexWriter.close();
 
         // Now search the index:
         DirectoryReader indexReader = DirectoryReader.open(directory);
         IndexSearcher indexSearcher = new IndexSearcher(indexReader);
         QueryParser parser = new QueryParser("content", analyzer);
-        Query query = parser.parse("index data");
+        Query query = parser.parse("chicken");
 
         System.out.println(query.toString());
         int topHitCount = 100;

@@ -44,16 +44,17 @@ public class CS242_Index
         IndexWriter indexWriter = new IndexWriter(directory, config);
 
 
-        String file_path="/outputs/foodie_crush_output";
+        String file_path="outputs/foodie_crush_output";
         Integer i=1;
-        while(i<130) {
+        while(i<2) {
             Document doc = new Document();
-           // Files.newBufferedReader(file_path.concat(i.toString()).concat(".txt"),StandardCharsets.UTF_8)
             try (BufferedReader r = newBufferedReader(Paths.get(file_path.concat(i.toString()).concat(".txt")),StandardCharsets.UTF_8)) {
                 String line;
                 while((line = r.readLine()) != null){
                         doc.add(new TextField("content", line, Field.Store.YES) );
+                        System.out.println("Reading Line: "+line);
                 }
+                i++;
 
             }
             indexWriter.addDocument(doc);
@@ -65,8 +66,10 @@ public class CS242_Index
         DirectoryReader indexReader = DirectoryReader.open(directory);
         IndexSearcher indexSearcher = new IndexSearcher(indexReader);
         QueryParser parser = new QueryParser("content", analyzer);
-        Query query = parser.parse("chicken");
+        Query query = parser.parse("ingredients");
 
+        System.out.println("");
+        System.out.println("------------------------ RESULTS --------------------------");
         System.out.println(query.toString());
         int topHitCount = 100;
         ScoreDoc[] hits = indexSearcher.search(query, topHitCount).scoreDocs;

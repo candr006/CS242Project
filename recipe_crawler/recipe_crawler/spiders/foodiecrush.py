@@ -24,16 +24,20 @@ f = open("outputs/foodie_crush_output1.txt", "w")
 
 def getLinks(url):
 	links=[]
-	if 'www.foodiecrush' in url:
-	    page = requests.get(url)
-	    soup = BeautifulSoup(page.text, 'html.parser')
-	    a_tags = soup.find_all('a')
-	    for a in a_tags:
-	    	if a['href'] not in global_links:
-	    		#print("Global Links: "+str(global_links))
-	    		#print("\n")
-	        	links.append(a['href'])
-	        	global_links.append(a['href'])
+	page = requests.get(url)
+	soup = BeautifulSoup(page.text, 'html.parser')
+	a_tags = soup.find_all('a')
+	ignore_list= ['/category','/tag/','/recipes/','/faq/','/about/','/workwithme/','/contact/']
+	for a in a_tags:
+		add_to_list= True
+		if 'www.foodiecrush' in a['href']:
+			if a['href'] not in global_links:
+				for i in ignore_list:
+					if i in a['href']:
+						add_to_list=False
+				if add_to_list:
+					links.append(a['href'])
+					global_links.append(a['href'])
 	return links
 pg_count=1
 out_num=1

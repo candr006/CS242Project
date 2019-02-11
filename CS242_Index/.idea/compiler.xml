@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="CS242_Index" target="1.5" />
+      <module name="CS242_Index" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>

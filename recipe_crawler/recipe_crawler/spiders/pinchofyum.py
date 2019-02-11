@@ -35,7 +35,11 @@ for j in range(32):
 		#f.write(link['href'])
 		if 'www.' in link['href']:
 			request = urllib2.Request(url = link['href'], headers=headers)
-			r=requests.get(link['href'])
+
+			try:
+				r=requests.get(link['href'])
+			except requests.exceptions.HTTPError as err:
+				print err()
 
 			if(r.status_code==200):
 				html_page = requests.get(link['href'])

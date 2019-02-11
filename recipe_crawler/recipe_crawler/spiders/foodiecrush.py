@@ -20,14 +20,14 @@ handler = urllib2.HTTPCookieProcessor(cookie)
 opener = urllib2.build_opener(handler)
 global_links = []
 
-f = open("outputs/foodie_crush_output1.txt", "w")
+f = open("outputs/foodie_crush_output16.txt", "w")
 
 def getLinks(url):
 	links=[]
 	page = requests.get(url)
 	soup = BeautifulSoup(page.text, 'html.parser')
 	a_tags = soup.find_all('a')
-	ignore_list= ['/category','/tag/','/recipes/','/faq/','/about/','/workwithme/','/contact/']
+	ignore_list= ['/category','/tag/','/recipes/','/faq/','/about/','/workwithme/','/contact/','%20']
 	for a in a_tags:
 		add_to_list= True
 		if 'www.foodiecrush' in a['href']:
@@ -40,8 +40,8 @@ def getLinks(url):
 					global_links.append(a['href'])
 	return links
 pg_count=1
-out_num=1
-for j in range(1,31):
+out_num=16
+for j in range(17,31):
 	print("-------------Menu page "+str(j)+" of 31-----------------")
 	page_links = getLinks("https://www.foodiecrush.com/category/recipes/page/"+str(j)+"/")
 

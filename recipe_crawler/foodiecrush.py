@@ -20,7 +20,7 @@ handler = urllib2.HTTPCookieProcessor(cookie)
 opener = urllib2.build_opener(handler)
 global_links = []
 
-f = open("outputs/foodie_crush_output16.txt", "w")
+f = open("outputs/foodie_crush_output1.txt", "w")
 
 def getLinks(url):
 	links=[]

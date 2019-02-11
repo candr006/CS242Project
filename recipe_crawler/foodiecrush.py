@@ -40,8 +40,8 @@ def getLinks(url):
 					global_links.append(a['href'])
 	return links
 pg_count=1
-out_num=16
-for j in range(17,31):
+out_num=1
+for j in range(1,31):
 	print("-------------Menu page "+str(j)+" of 31-----------------")
 	page_links = getLinks("https://www.foodiecrush.com/category/recipes/page/"+str(j)+"/")
 

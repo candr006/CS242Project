@@ -59,7 +59,7 @@ public class CS242_Index
         //this is where the outputs of the crawler are stored
         //iterate through all the crawled files
         //String file_path = pwd + "/allRecipesTogether.txt";
-/*
+
         System.out.println("Generating Epicurious Indices");
         try (BufferedReader r = newBufferedReader(Paths.get(file_path), StandardCharsets.UTF_8)) {
             Document doc = new Document();
@@ -97,7 +97,7 @@ public class CS242_Index
 
         }
         //this is where the outputs of the crawler are stored
-  */      //iterate through all the crawled files
+        //iterate through all the crawled files
         String file_path = pwd + "/outputs/foodie_crush_output";
         System.out.println("Generating FoodieCrush Indices");
         Integer i = 1;
